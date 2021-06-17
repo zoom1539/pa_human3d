@@ -19,6 +19,6 @@ public:
     bool run(const cv::Mat &img_, std::vector<cv::Vec3f> &vertices_);
     
 private:
-    // Detector _detector;
+    Detector _detector;
     HMR _hmr;
 };
