@@ -42,6 +42,9 @@ target_link_libraries(human3d ${OpenCV_LIBS}
 # make install
 install(FILES class_human3d.h DESTINATION include)
 install(TARGETS human3d LIBRARY DESTINATION lib)
-install(FILES extra/yolov5s.engine DESTINATION lib)
-install(FILES extra/hmr_fp16_b4.engine DESTINATION lib)
+install(FILES extra/yolov5s_fp16_b1.engine DESTINATION lib)
+install(FILES extra/hmr_fp16_b1.engine DESTINATION lib)
 install(FILES extra/smpl_male.json DESTINATION lib)
+install(FILES extra/libdetector.so DESTINATION lib)
+install(FILES extra/libhmr.so DESTINATION lib)
+install(FILES ../data/im1010.jpg DESTINATION .)

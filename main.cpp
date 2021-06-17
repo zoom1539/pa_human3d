@@ -25,38 +25,49 @@ int main()
     }
 
     //
+    
     cv::Mat img = cv::imread("../data/im1010.jpg");
     
-    auto start = std::chrono::system_clock::now();
+    int iter = 100;
+    int total_time = 0;
 
-    std::vector<cv::Vec3f> vertices;
-    bool is_run = human3d.run(img, vertices);
-    if(!is_run)
+    for (int i = 0; i < iter; i++)
     {
-        std::cout << "no people detected\n";
-    }
+        auto start = std::chrono::system_clock::now();
 
-    auto end = std::chrono::system_clock::now();
-    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " total ms" << std::endl;
-
-    if (is_run)
-    {
-        std::ofstream outFile("verts.obj");
-        
-        for (int j = 0; j < vertices.size(); j++)
+        std::vector<cv::Vec3f> vertices;
+        bool is_run = human3d.run(img, vertices);
+        if(!is_run)
         {
-            outFile <<"v ";
-            for (int k = 0; k < 3; k++)
-            {
-                outFile << vertices[j][k] << " ";
-            }
-            
-            outFile <<"\n";
+            std::cout << "no people detected\n";
         }
+
+        auto end = std::chrono::system_clock::now();
+        total_time += std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms" << std::endl;
+
+        if (is_run)
+        {
+            std::ofstream outFile("verts.obj");
             
-        outFile.close();
-        std::cout << "verts save\n";
+            for (int j = 0; j < vertices.size(); j++)
+            {
+                outFile <<"v ";
+                for (int k = 0; k < 3; k++)
+                {
+                    outFile << vertices[j][k] << " ";
+                }
+                
+                outFile <<"\n";
+            }
+                
+            outFile.close();
+            std::cout << "verts save\n";
+        }
     }
+
+    std::cout << "average: " << total_time / iter << " ms" << std::endl;
+
 
     std::cin.get();
     return 0;
