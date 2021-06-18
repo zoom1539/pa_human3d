@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 #include <time.h>
-#include <chrono>
+#include <sys/time.h>  
 #include "class_human3d.h"
 
 int main()
@@ -28,12 +28,13 @@ int main()
     
     cv::Mat img = cv::imread("../data/im1010.jpg");
     
-    int iter = 100;
-    int total_time = 0;
+    int iter = 1000;
+    double total_time = 0;
 
     for (int i = 0; i < iter; i++)
     {
-        auto start = std::chrono::system_clock::now();
+        struct timeval tvBegin, tvEnd;
+        gettimeofday(&tvBegin, NULL);
 
         std::vector<cv::Vec3f> vertices;
         bool is_run = human3d.run(img, vertices);
@@ -42,9 +43,10 @@ int main()
             std::cout << "no people detected\n";
         }
 
-        auto end = std::chrono::system_clock::now();
-        total_time += std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-        std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms" << std::endl;
+        gettimeofday(&tvEnd, NULL);
+        double dDuration = 1000 * (tvEnd.tv_sec - tvBegin.tv_sec) + ((tvEnd.tv_usec - tvBegin.tv_usec) / 1000.0);
+        total_time += dDuration;
+        std::cout << dDuration << " ms" << std::endl;
 
         if (is_run)
         {
