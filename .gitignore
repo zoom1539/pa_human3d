@@ -6,3 +6,5 @@ lib/extra/libdetector.so
 lib/extra/libhmr.so
 lib/extra/smpl_male.json
 lib/extra/yolov5s_fp16_b1.engine
+lib/extra/kp_fp16_b1.engine
+lib/extra/libkeypoints.so

@@ -6,16 +6,16 @@ include_directories(/usr/local/cuda/include)
 link_directories(/usr/local/cuda/lib64)
 
 # OpenCV
-find_package(OpenCV 3.4.8 REQUIRED PATHS ~/PLATFORM/3rdparty/opencv348)
+find_package(OpenCV 3.4.15 REQUIRED PATHS /root/PLATFORM/3rdparty/opencv3415)
 # find_package(OpenCV REQUIRED)
 
 # TensorRT
-set(TENSORRT_ROOT ~/PLATFORM/3rdparty/TensorRT-7.0.0.11)
+set(TENSORRT_ROOT /root/PLATFORM/3rdparty/TensorRT-7.0.0.11)
 set(TENSORRT_INCLUDE_DIR ${TENSORRT_ROOT}/include)
 set(TENSORRT_LIB_DIR ${TENSORRT_ROOT}/lib)
 
 #libtorch
-set(LIBTORCH_ROOT ~/PLATFORM/3rdparty/libtorch131)
+set(LIBTORCH_ROOT /root/PLATFORM/3rdparty/libtorch131)
 set(LIBTORCH_INCLUDE_DIRS ${LIBTORCH_ROOT}/include ${LIBTORCH_ROOT}/include/torch/csrc/api/include)
 set(LIBTORCH_LIB_DIR ${LIBTORCH_ROOT}/lib)
 
@@ -35,6 +35,7 @@ target_link_libraries(human3d ${OpenCV_LIBS}
                       ${CUDA_LIBRARIES}
                       ${CMAKE_CURRENT_SOURCE_DIR}/extra/libdetector.so
                       ${CMAKE_CURRENT_SOURCE_DIR}/extra/libhmr.so 
+                      ${CMAKE_CURRENT_SOURCE_DIR}/extra/libkeypoints.so 
                       ${LIBTORCH_LIB_DIR}/libtorch.so
                       )
 
@@ -44,7 +45,9 @@ install(FILES class_human3d.h DESTINATION include)
 install(TARGETS human3d LIBRARY DESTINATION lib)
 install(FILES extra/yolov5s_fp16_b1.engine DESTINATION lib)
 install(FILES extra/hmr_fp16_b1.engine DESTINATION lib)
+install(FILES extra/kp_fp16_b1.engine DESTINATION lib)
 install(FILES extra/smpl_male.json DESTINATION lib)
 install(FILES extra/libdetector.so DESTINATION lib)
 install(FILES extra/libhmr.so DESTINATION lib)
+install(FILES extra/libkeypoints.so DESTINATION lib)
 install(FILES ../data/im1010.jpg DESTINATION .)
