@@ -29,12 +29,14 @@ int main()
     }
 
     //
-    int iter = 10;
+    int cnt = 279;
     double total_time = 0;
 
-    for (int i = 0; i < iter; i++)
+    for (int i = 0; i < cnt; i++)
     {
-        cv::Mat img = cv::imread("../data/zidane.jpg");
+        std::stringstream ss;
+        ss << "../data/image-" << i + 1 << ".jpg";
+        cv::Mat img = cv::imread(ss.str());
 
         struct timeval tvBegin, tvEnd;
         gettimeofday(&tvBegin, NULL);
@@ -65,7 +67,7 @@ int main()
                                             cv::Vec2i(5, 6), cv::Vec2i(5, 7), cv::Vec2i(7, 9), 
                                             cv::Vec2i(6, 8),cv::Vec2i(8, 10),
                                             cv::Vec2i(11, 12), cv::Vec2i(11, 13), cv::Vec2i(13, 15), 
-                                            cv::Vec2i(12, 14),cv::Vec2i(12, 16)};
+                                            cv::Vec2i(12, 14),cv::Vec2i(14, 16)};
             
             for (int i = 0 ; i < bones.size(); i++)
             {
@@ -115,9 +117,10 @@ int main()
             outFile.close();
             std::cout << "verts save\n";
         }
+        std::cin.get();
     }
 
-    std::cout << "average: " << total_time / iter << " ms" << std::endl;
+    // std::cout << "average: " << total_time / iter << " ms" << std::endl;
 
 
     std::cin.get();
