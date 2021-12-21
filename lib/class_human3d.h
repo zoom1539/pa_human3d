@@ -11,6 +11,7 @@ public:
     bool init(const std::string &detect_engine_path_,
               const std::string &kp_engine_path_,
               float kp_conf_,
+              const cv::Size &img_size_, //(width, height)
               const std::string &hmr_engine_path_,
               std::string &smpl_male_json_path_);
 

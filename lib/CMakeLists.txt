@@ -36,6 +36,7 @@ target_link_libraries(human3d ${OpenCV_LIBS}
                       ${CMAKE_CURRENT_SOURCE_DIR}/extra/libdetector.so
                       ${CMAKE_CURRENT_SOURCE_DIR}/extra/libhmr.so 
                       ${CMAKE_CURRENT_SOURCE_DIR}/extra/libkeypoints.so 
+                      ${CMAKE_CURRENT_SOURCE_DIR}/extra/libtracker.so 
                       ${LIBTORCH_LIB_DIR}/libtorch.so
                       )
 
@@ -50,4 +51,5 @@ install(FILES extra/smpl_male.json DESTINATION lib)
 install(FILES extra/libdetector.so DESTINATION lib)
 install(FILES extra/libhmr.so DESTINATION lib)
 install(FILES extra/libkeypoints.so DESTINATION lib)
+install(FILES extra/libtracker.so DESTINATION lib)
 install(FILES ../data/im1010.jpg DESTINATION .)

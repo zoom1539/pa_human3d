@@ -20,12 +20,14 @@ Human3d::~Human3d()
 bool Human3d::init(const std::string &detect_engine_path_,
                     const std::string &kp_engine_path_,
                     float kp_conf_,
+                    const cv::Size &img_size_, //(width, height)
                     const std::string &hmr_engine_path_,
                     std::string &smpl_male_json_path_)
 {
     return _impl->_human3d.init(detect_engine_path_, 
                                 kp_engine_path_,
                                 kp_conf_,
+                                img_size_,
                                 hmr_engine_path_, 
                                 smpl_male_json_path_);
 }

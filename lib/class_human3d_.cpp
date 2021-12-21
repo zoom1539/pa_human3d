@@ -1,6 +1,9 @@
 #include "class_human3d_.h"
 
-_Human3d::_Human3d() {}
+_Human3d::_Human3d() 
+{
+    _track_mode = false;
+}
 _Human3d::~_Human3d() 
 {
     
@@ -9,6 +12,7 @@ _Human3d::~_Human3d()
 bool _Human3d::init(const std::string &detect_engine_path_,
                     const std::string &kp_engine_path_,
                     float kp_conf_,
+                    const cv::Size &img_size_, //(width, height)
                     const std::string &hmr_engine_path_,
                     std::string &smpl_male_json_path_)
 {
@@ -35,6 +39,7 @@ bool _Human3d::init(const std::string &detect_engine_path_,
     }
 
     _kp_conf = kp_conf_;
+    _img_size = img_size_;
 
     return true;
 }
@@ -63,14 +68,68 @@ void _Human3d::run(const cv::Mat &img_,
         return;
     }
 
+    std::vector<cv::Rect> person_rects;
+    for (int i = 0; i < vec_detections[0].size(); i++)
+    {
+        if (vec_detections[0][i].class_id == 0)
+        {
+            person_rects.push_back(vec_detections[0][i].rect);
+        }
+    }
 
-    bool has_person = find_max_rect(const std::vector<std::vector<Detection> > &vec_detections_,
-                      cv::Rect &max_rect_);
+    if (0 == person_rects.size())
+    {
+        return;
+    }
+
+    //
+    bool has_target = false;
+    cv::Rect target_rect;
+    if (!_track_mode)
+    {
+        cv::Rect max_rect;
+        has_target = find_max_rect(person_rects, max_rect);
+        target_rect = max_rect;
+        _track_mode = true;
+
+        //
+        std::vector<cv::Rect> rects;
+        rects.push_back(max_rect);
+        std::vector<TrackedBox> rects_tracked;
+		_tracker.run(rects, _img_size, rects_tracked);
+
+        if (rects_tracked.size() > 0)
+        {
+            _target_id = rects_tracked[0].id;
+        }
+
+    }
+    else
+    {
+        std::vector<TrackedBox> rects_tracked;
+		_tracker.run(person_rects, _img_size, rects_tracked);
+
+        for (int i = 0; i < rects_tracked.size(); i++)
+		{
+			if (rects_tracked[i].id == _target_id)
+            {
+                target_rect = rects_tracked[i].rect;
+                has_target = true;
+                break;
+            }
+		}
+
+        if (!has_target)
+        {
+            _track_mode = false;
+        }
+
+    }
 
     
-    if (has_person)
+    if (has_target)
     {
-        output(img_, max_rect_, 
+        output(img_, target_rect, 
                person_rect_, kp_coords_, kp_scores_, vertices_);
     }
     
@@ -133,30 +192,19 @@ void _Human3d::output(const cv::Mat &img_,
 
 }
 
-bool find_max_rect(const std::vector<std::vector<Detection> > &vec_detections_,
+bool _Human3d::find_max_rect(const std::vector<cv::Rect> &person_rects_,
                     cv::Rect &max_rect_)
 {
-    bool has_person = false;
-    Detection max_area_detection;
-    max_area_detection.rect = cv::Rect(0, 0, 0, 0);
-    for (int i = 0; i < vec_detections[0].size(); i++)
+    cv::Rect max_rect = cv::Rect(0, 0, 0, 0);
+    for (int i = 0; i < person_rects_.size(); i++)
     {
-        if (vec_detections[0][i].class_id == 0)
+        if (person_rects_[i].area() > max_rect.area())
         {
-            has_person = true;
-            if (vec_detections[0][i].rect.area() > max_area_detection.rect.area())
-            {
-               max_area_detection = vec_detections[0][i]; 
-            }
+            max_rect = person_rects_[i]; 
         }
     }
 
-    if(has_person)
-    {
-        max_rect_ = max_area_detection.rect;
-        return true;
-    }
-
-    return false;
+    max_rect_ = max_rect;
+    return true;
 }
 

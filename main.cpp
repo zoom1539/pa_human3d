@@ -16,10 +16,12 @@ int main()
     std::string hmr_engine_path = "../lib/extra/hmr_fp16_b1.engine";
     std::string smpl_male_json_path = "../lib/extra/smpl_male.json";
     float kp_conf = 0.3;
+    cv::Size img_size(1920, 1080); //(width, height)
     
     bool is_init = human3d.init(detect_engine_path, 
                                 kp_engine_path, 
                                 kp_conf,
+                                img_size,
                                 hmr_engine_path,
                                 smpl_male_json_path);
     if(!is_init)
