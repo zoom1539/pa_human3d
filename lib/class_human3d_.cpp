@@ -63,6 +63,79 @@ void _Human3d::run(const cv::Mat &img_,
         return;
     }
 
+
+    bool has_person = find_max_rect(const std::vector<std::vector<Detection> > &vec_detections_,
+                      cv::Rect &max_rect_);
+
+    
+    if (has_person)
+    {
+        output(img_, max_rect_, 
+               person_rect_, kp_coords_, kp_scores_, vertices_);
+    }
+    
+}
+
+void _Human3d::output(const cv::Mat &img_,
+                    const cv::Rect &target_rect_,
+                    cv::Rect &person_rect_,
+                    std::vector<cv::Point2f> &kp_coords_,
+                    std::vector<float> &kp_scores_,
+                    std::vector<cv::Vec3f> &vertices_)
+{
+    person_rect_ = target_rect_;
+
+    std::vector<cv::Mat> imgs;
+    imgs.push_back(img_(target_rect_));
+
+    // kp
+    std::vector<std::vector<cv::Point2f> > vec_coords;
+    std::vector<std::vector<float> > vec_scores;
+    bool is_run = _keypoints.run(imgs, vec_coords, vec_scores);
+    if ((!is_run) || (0 == vec_scores.size()))
+    {
+        return;
+    }
+    kp_coords_ = vec_coords[0];
+    float offset_x = target_rect_.x;
+    float offset_y = target_rect_.y;
+
+    for (int i = 0; i < kp_coords_.size(); i++)
+    {
+        kp_coords_[i] += cv::Point2f(offset_x, offset_y);
+    }
+
+    kp_scores_ = vec_scores[0];
+
+    bool kp_unvalid = true;
+    if (kp_scores_[15] > _kp_conf && kp_scores_[16] > _kp_conf) // ankles are visible
+    {
+        kp_unvalid = false;
+    }
+
+    if (kp_unvalid)
+    {
+        return;
+    }
+
+    // hmr
+    std::vector<std::vector<cv::Vec3f> > poses;
+    std::vector<std::vector<float> > shapes;
+    std::vector<std::vector<cv::Vec3f> > vec_3djoints;
+    std::vector<std::vector<cv::Vec3f> > vec_vertices;
+    is_run = _hmr.run_joints(imgs, poses, shapes, vec_3djoints, vec_vertices);
+    if ((!is_run) || (0 == vec_vertices.size()))
+    {
+        return;
+    }
+
+    vertices_ = vec_vertices[0];
+
+}
+
+bool find_max_rect(const std::vector<std::vector<Detection> > &vec_detections_,
+                    cv::Rect &max_rect_)
+{
     bool has_person = false;
     Detection max_area_detection;
     max_area_detection.rect = cv::Rect(0, 0, 0, 0);
@@ -78,56 +151,12 @@ void _Human3d::run(const cv::Mat &img_,
         }
     }
 
-    if (has_person)
+    if(has_person)
     {
-        person_rect_ = max_area_detection.rect;
-
-        std::vector<cv::Mat> imgs;
-        imgs.push_back(img_(max_area_detection.rect));
-
-        // kp
-        std::vector<std::vector<cv::Point2f> > vec_coords;
-        std::vector<std::vector<float> > vec_scores;
-        bool is_run = _keypoints.run(imgs, vec_coords, vec_scores);
-        if ((!is_run) || (0 == vec_scores.size()))
-        {
-            return;
-        }
-        kp_coords_ = vec_coords[0];
-        float offset_x = max_area_detection.rect.x;
-        float offset_y = max_area_detection.rect.y;
-
-        for (int i = 0; i < kp_coords_.size(); i++)
-        {
-            kp_coords_[i] += cv::Point2f(offset_x, offset_y);
-        }
-
-        kp_scores_ = vec_scores[0];
-
-        bool kp_unvalid = true;
-        if (kp_scores_[15] > _kp_conf && kp_scores_[16] > _kp_conf) // ankles are visible
-        {
-            kp_unvalid = false;
-        }
-
-        if (kp_unvalid)
-        {
-            return;
-        }
-
-        // hmr
-        std::vector<std::vector<cv::Vec3f> > poses;
-        std::vector<std::vector<float> > shapes;
-        std::vector<std::vector<cv::Vec3f> > vec_3djoints;
-        std::vector<std::vector<cv::Vec3f> > vec_vertices;
-        is_run = _hmr.run_joints(imgs, poses, shapes, vec_3djoints, vec_vertices);
-        if ((!is_run) || (0 == vec_vertices.size()))
-        {
-            return;
-        }
-
-        vertices_ = vec_vertices[0];
+        max_rect_ = max_area_detection.rect;
+        return true;
     }
-    
+
+    return false;
 }
 

@@ -26,6 +26,15 @@ public:
              std::vector<cv::Vec3f> &vertices_);
     
 private:
+    bool find_max_rect(const std::vector<std::vector<Detection> > &vec_detections_,
+                    cv::Rect &max_rect_);
+    void output(const cv::Mat &img_,
+                    const cv::Rect &target_rect_,
+                    cv::Rect &person_rect_,
+                    std::vector<cv::Point2f> &kp_coords_,
+                    std::vector<float> &kp_scores_,
+                    std::vector<cv::Vec3f> &vertices_);
+private:
     float _kp_conf;
     Detector _detector;
     Keypoints _keypoints;
